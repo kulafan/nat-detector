@@ -5,8 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NAT 类型检测工具 - 库拉饭 Kulafan‘s Blog</title>
-    <!-- 引入Waline的CSS样式 -->
-  <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+
   
   <style>
     body {
@@ -174,6 +173,14 @@
 
 <br>
 
+<head>
+  <!-- 引入Waline的CSS样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+</head>
+
+<body>
+  <!-- 其他页面内容 -->
+
   <!-- 用于显示评论区的容器 -->
   <div id="waline"></div>
 
@@ -182,12 +189,12 @@
     import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
     init({
       el: '#waline',
-      serverURL: 'https://waline.kulafan.com',
-      path: location.nat-detector // 关键：使用当前页面路径来区分不同页面的评论
+      serverURL: 'waline.kulafan.com',
+      path: '/nat'  // 关键：使用当前页面路径来区分不同页面的评论
     });
   </script>
-  
 </body>
+
 
 <body>
     <!-- 用于显示访客数的容器 -->
