@@ -72,6 +72,7 @@
 
 <body>
   <a href="https://www.kulafan.com" target="_blank">返回kulafan博客</a>
+
   <h1>🌐 NAT 类型检测工具</h1>
   <div class="function-row">
     <p>选 STUN 服务器：</p>
@@ -165,5 +166,40 @@
     }
   </script>
 </body>
+
+<body>
+    <!-- 用于显示访客数的容器 -->
+    <span id="finicount_views"></span>
+    <!-- 引入统计脚本 -->
+    <script async src="//finicounter.eu.org/finicounter.js"></script>
+</body>
+
+<br>
+<head>
+  <!-- ... -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@waline/client@v3/dist/waline.css"
+  />
+  <!-- ... -->
+</head>
+<body>
+  <!-- ... -->
+  <div id="waline"></div>
+  <script type="module">
+    import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+
+    init({
+      el: '#waline',
+      serverURL: 'https://waline.kulafan.com',
+    });
+  </script>
+
+</body>
+
+
+ 
+
+
 
 </html>
