@@ -1,33 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
   <meta charset="UTF-8" />
   <title>NAT 类型检测工具</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 40px; background: #f4f4f4; }
-    h1 { color: #333; }
-    pre { background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 0 10px #ccc; white-space: pre-wrap; }
-    select, button { padding: 10px; font-size: 16px; margin-right: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    pre {
+      background: #fff;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #ccc;
+      white-space: pre-wrap;
+    }
+
+    select,
+    button,
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+   .function-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+   .nat-explanation {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #ccc;
+    }
   </style>
 </head>
-<body>
-  <h1>🌐 NAT 类型检测工具</h1>
-  <p>请选择一个 STUN 服务器：</p>
-  <select id="stunSelector">
-    <option value="stun:stun.l.google.com:19302">Google（可能无法连接）</option>
-    <option value="stun:stun.qq.com:3478">腾讯云（stun.qq.com）</option>
-    <option value="stun:stun.huawei.com:3478">华为云（stun.huawei.com）</option>
-    <option value="stun:stun.xten.com">Xten 公共服务器</option>
-    <option value="stun:stun.services.mozilla.com">Mozilla</option>
-  </select>
-  <button onclick="runTest()">开始检测</button>
 
+<body>
+  <a href="https://www.kulafan.com" target="_blank">返回kulafan博客</a>
+  <h1>🌐 NAT 类型检测工具</h1>
+  <div class="function-row">
+    <p>选 STUN 服务器：</p>
+    <select id="stunSelector">
+      <option value="stun:stun.l.google.com:19302">Google</option>
+      <option value="stun:stun.qq.com:3478">腾讯云</option>
+      <option value="stun:stun.huawei.com:3478">华为云</option>
+      <option value="stun:stun.xten.com">Xten 服务器</option>
+      <option value="stun:stun.services.mozilla.com">Mozilla</option>
+    </select>
+    <p>或自定：</p>
+    <input type="text" id="customStunServer" placeholder="STUN 服务器地址">
+    <button onclick="runTest()">检测</button>
+    <button onclick="clearResult()">清除</button>
+  </div>
   <pre id="output">等待检测...</pre>
+  <div class="nat-explanation">
+    <h2>NAT类型说明</h2>
+    <p><strong>开放型 NAT（Full Cone NAT）或公网IP</strong>：设备可直接与外部网络通信，具有较好的网络穿透性，适合大多数P2P应用和在线游戏。</p>
+    <p><strong>受限锥形 NAT 或 端口受限锥形 NAT</strong>：外部设备需先收到内部设备的请求，才能建立连接，穿透性中等，部分应用可能需要额外配置。</p>
+    <p><strong>对称 NAT（Symmetric NAT）或 UDP 被阻止</strong>：不同目标地址或端口的连接需重新映射，穿透性较差，可能导致部分依赖网络连接的应用无法正常使用。</p>
+  </div>
 
   <script>
     function runTest() {
       const output = document.getElementById('output');
-      const stunServer = document.getElementById('stunSelector').value;
+      const customStun = document.getElementById('customStunServer').value;
+      const stunSelector = document.getElementById('stunSelector');
+      let stunServer;
+      if (customStun) {
+        stunServer = customStun;
+      } else {
+        stunServer = stunSelector.value;
+      }
 
       output.textContent = "检测中，请稍等...";
 
@@ -47,8 +102,8 @@
 
       rtc.createDataChannel("test");
       rtc.createOffer()
-        .then(offer => rtc.setLocalDescription(offer))
-        .catch(err => {
+       .then(offer => rtc.setLocalDescription(offer))
+       .catch(err => {
           output.textContent = "创建连接失败：" + err;
         });
 
@@ -64,25 +119,28 @@
         let natType = "无法判断";
 
         if (relay > 0) {
-          natType = "对称 NAT（Symmetric NAT）或 UDP 被阻止";
+          natType = "对称 NAT 或 UDP 被阻止";
         } else if (srflx > 0) {
           natType = "受限锥形 NAT 或 端口受限锥形 NAT";
         } else if (host > 0) {
-          natType = "开放型 NAT（Full Cone NAT）或公网 IP";
+          natType = "开放型 NAT 或公网 IP";
         }
 
         output.textContent = `使用 STUN 服务器：${stunServer}
-
-检测结果如下：
-------------------------
+检测结果：
 本地候选（host）：${host} 个
 服务器反射（srflx）：${srflx} 个
 中继地址（relay）：${relay} 个
-
-推测你的 NAT 类型是：${natType}
+推测 NAT 类型：${natType}
 `;
       }
     }
+
+    function clearResult() {
+      const output = document.getElementById('output');
+      output.textContent = "等待检测...";
+    }
   </script>
 </body>
+
 </html>
