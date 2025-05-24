@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>NAT 类型检测工具</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; background: #f4f4f4; }
+    h1 { color: #333; }
+    pre { background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 0 10px #ccc; white-space: pre-wrap; }
+    select, button { padding: 10px; font-size: 16px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>🌐 NAT 类型检测工具</h1>
+  <p>请选择一个 STUN 服务器：</p>
+  <select id="stunSelector">
+    <option value="stun:stun.qq.com:3478">腾讯云（stun.qq.com）</option>
+    <option value="stun:stun.huawei.com:3478">华为云（stun.huawei.com）</option>
+    <option value="stun:stun.xten.com">Xten 公共服务器</option>
+    <option value="stun:stun.services.mozilla.com">Mozilla</option>
+    <option value="stun:stun.l.google.com:19302">Google（可能无法连接）</option>
+  </select>
+  <button onclick="runTest()">开始检测</button>
+
+  <pre id="output">等待检测...</pre>
+
+  <script>
+    function runTest() {
+      const output = document.getElementById('output');
+      const stunServer = document.getElementById('stunSelector').value;
+
+      output.textContent = "检测中，请稍等...";
+
+      const rtc = new RTCPeerConnection({
+        iceServers: [{ urls: stunServer }]
+      });
+
+      let candidates = [];
+
+      rtc.onicecandidate = (event) => {
+        if (event.candidate) {
+          candidates.push(event.candidate.candidate);
+        } else {
+          analyzeCandidates(candidates);
+        }
+      };
+
+      rtc.createDataChannel("test");
+      rtc.createOffer()
+        .then(offer => rtc.setLocalDescription(offer))
+        .catch(err => {
+          output.textContent = "创建连接失败：" + err;
+        });
+
+      function analyzeCandidates(candidates) {
+        let host = 0, srflx = 0, relay = 0;
+
+        candidates.forEach(candidate => {
+          if (candidate.includes("typ host")) host++;
+          else if (candidate.includes("typ srflx")) srflx++;
+          else if (candidate.includes("typ relay")) relay++;
+        });
+
+        let natType = "无法判断";
+
+        if (relay > 0) {
+          natType = "对称 NAT（Symmetric NAT）或 UDP 被阻止";
+        } else if (srflx > 0) {
+          natType = "受限锥形 NAT 或 端口受限锥形 NAT";
+        } else if (host > 0) {
+          natType = "开放型 NAT（Full Cone NAT）或公网 IP";
+        }
+
+        output.textContent = `使用 STUN 服务器：${stunServer}
+
+检测结果如下：
+------------------------
+本地候选（host）：${host} 个
+服务器反射（srflx）：${srflx} 个
+中继地址（relay）：${relay} 个
+
+推测你的 NAT 类型是：${natType}
+`;
+      }
+    }
+  </script>
+</body>
+</html>
