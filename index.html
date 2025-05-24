@@ -5,6 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NAT 类型检测工具 - 库拉饭 Kulafan‘s Blog</title>
+    <!-- 引入Waline的CSS样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -167,37 +170,31 @@
   </script>
 </body>
 
+
+
+<br>
+
+  <!-- 用于显示评论区的容器 -->
+  <div id="waline"></div>
+
+  <!-- 引入Waline的JavaScript文件并初始化 -->
+  <script type="module">
+    import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+    init({
+      el: '#waline',
+      serverURL: 'https://waline.kulafan.com',
+      path: location.nat-detector // 关键：使用当前页面路径来区分不同页面的评论
+    });
+  </script>
+  
+</body>
+
 <body>
     <!-- 用于显示访客数的容器 -->
     <span id="finicount_views"></span>
     <!-- 引入统计脚本 -->
     <script async src="//finicounter.eu.org/finicounter.js"></script>
 </body>
-
-<br>
-<head>
-  <!-- ... -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/@waline/client@v3/dist/waline.css"
-  />
-  <!-- ... -->
-</head>
-<body>
-  <!-- ... -->
-  <div id="waline"></div>
-  <script type="module">
-    import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
-
-    init({
-      el: '#waline',
-      serverURL: 'https://waline.kulafan.com',
-    });
-  </script>
-
-</body>
-
-
  
 
 
